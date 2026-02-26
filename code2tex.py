@@ -23,9 +23,7 @@ def build_cnt(ext,cnt):
         "\\usepackage{mminted}" \
         "\\usepackage{macro}" \
         "\\begin{document}" \
-        "\\newlength{\charwidth}" \
-        "\\settowidth{\charwidth}{\\texttt{0}}"\
-        f"\\begin{{varwidth}}{{{len}\\charwidth}}" \
+        f"\\begin{{varwidth}}{{{len+2}\\charwidth}}" \
         f"\\begin{{{mint_tag}}}\n"\
         f"{cnt}\n"\
         f"\\end{{{mint_tag}}}\n"\

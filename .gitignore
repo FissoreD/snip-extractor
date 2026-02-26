@@ -1,0 +1,7 @@
+**/*.tex
+**/*.log
+**/_minted
+**/*.aux
+**/*.pdf
+**/*.gz
+__pycache__

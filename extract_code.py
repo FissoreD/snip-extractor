@@ -1,13 +1,5 @@
 import os, sys, re
 
-# OPEN_COMMENT = "(*"
-# END_COMMENT = "*)"
-# OUT_DIR = "tex_code"
-# EXTENTION = "v"
-# MINT_TAG = "coqcode"
-# OPEN_TAG = "SNIP:"
-# CLOSE_TAG = "ENDSNIP"
-
 def find_close_par(l, i):
     cnt = 1
     for i in range(i+1,len(l)):
@@ -101,13 +93,6 @@ def clean_line_global(l,escape):
     l = re.sub(r' -sub\(([^)]*)\)', lambda x: esc(clean_esc(x)), l)
     return l
 
-# def latexify(expr):
-#     expr = expr.replace("->", r"\to")
-#     expr = expr.replace("_", r"\_")
-#     expr = expr.replace("(", r"(")
-#     expr = expr.replace(")", r")")
-#     return expr.strip()
-
 class C:
     def __init__(self,oc,ec,od,ext,ot,ct,esc):
         self.OPEN_COMMENT = oc
@@ -168,11 +153,9 @@ class C:
     def read_file(self,fname):
         with open(fname) as f:
             lines = f.readlines()
-            # print_tex(get_file_cnt(lines), mk_fname(fname))
             snippets = self.get_snippets(lines)
             for (fname,lines) in snippets.items():
                 self.print_tex(lines, fname + ".tex")
-                # print_tex(lines, fname + "_raw.tex", True)
 
     def print_tex(lines, fout, raw = False):
         raise Exception("TO BE IMPLEMENTED IN CHILD")
@@ -181,12 +164,17 @@ class C:
         if not os.path.exists(self.OUT_DIR):
             os.makedirs(self.OUT_DIR)
         fout = f"{self.OUT_DIR}/{fout}"
+        if os.path.exists(fout):
+            with open(fout, "r") as fr:
+                cnt1 = fr.read()
+                if cnt == cnt1:
+                    return
         with open(fout, "w") as f:
             f.write(cnt)
 
 class snip(C):
-    def __init__(self,mintag,mintinl):
-        super(snip,self).__init__("(*","*)","tex_code","v","SNIP:","ENDSNIP",True)
+    def __init__(self,mintag,mintinl,out):
+        super(snip,self).__init__("(*","*)",out,"v","SNIP:","ENDSNIP",True)
         self.MINT_TAG = mintag
         self.MINT_INLINE = mintinl
 
@@ -217,8 +205,8 @@ It displaies a mintinline if the definition is of exactely one line,
 otherwise it displaies a minted multiline code-block
 """
 class theorem(C):
-    def __init__(self,mintag,mintinl):
-        super(theorem,self).__init__("(*","*)","tex_code","v","SNIPT:","ENDSNIPT",True)
+    def __init__(self,mintag,mintinl,out):
+        super(theorem,self).__init__("(*","*)",out,"v","SNIPT:","ENDSNIPT",True)
         self.MINT_TAG = mintag
         self.MINT_INLINE = mintinl
 
@@ -248,14 +236,6 @@ class theorem(C):
         n2 = name.replace('_', '')
         args = "" if len(args) == 0 else (f" \\{self.MINT_INLINE}{{" + self.clean_line(" ".join(args)) + "}")
         cnt += f"\\begin{{{env}}}[{n1}{args}]\label{{th:{n2}}}"
-        # if len(tl) == 1:
-        #     txt = self.clean_line(tl[0].strip())
-        #     cnt += f"\\{self.MINT_INLINE}{{{txt}}}"
-        # else:
-        #     cnt += f"~\n\\begin{{{self.MINT_TAG}}}\n"
-        #     for l in tl:
-        #         cnt += self.clean_line(self.clean_comment(l))
-        #     cnt += f"\\end{{{self.MINT_TAG}}}\n"
         if len(tl) > 0:
             txt = self.clean_line(tl[0].strip())
             cnt += f"\\{self.MINT_INLINE}{{{txt}}}"
@@ -281,8 +261,8 @@ def flatten(xss):
 def stack_anchor(f1,f2):
     return f"\stackanchor{{{f1}}}{{{f2}}}"
 class bussproof(C):
-    def __init__(self):
-        super(bussproof,self).__init__("(*","*)","tex_code","v","prooftree:","endprooftree",False)
+    def __init__(self,out):
+        super(bussproof,self).__init__("(*","*)",out,"v","prooftree:","endprooftree",False)
 
 
 
@@ -350,8 +330,8 @@ class bussproof(C):
         super().write(fout,cnt)
 
 if __name__ == "__main__":
-    fname = sys.argv[1]
-    print(fname)
-    bussproof().read_file(fname)
-    snip("coqcode","cI").read_file(fname)
-    theorem("coqcode","cI").read_file(fname)
+    out = sys.argv[1]
+    fname = sys.argv[2]
+    bussproof(out).read_file(fname)
+    snip("coqcode","cI",out).read_file(fname)
+    theorem("coqcode","cI",out).read_file(fname)

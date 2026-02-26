@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    // "**/*.tex" : true,
+    "**/*.log" : true,
+    "**/_minted" : true,
+    "**/*.aux" : true,
+    "**/*.gz" : true,
+  }
+}

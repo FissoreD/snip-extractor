@@ -1,0 +1,48 @@
+%  __  __ _____ _   _ _______ ______ _____  
+% |  \/  |_   _| \ | |__   __|  ____|  __ \ 
+% | \  / | | | |  \| |  | |  | |__  | |  | |
+% | |\/| | | | | . ` |  | |  |  __| | |  | |
+% | |  | |_| |_| |\  |  | |  | |____| |__| |
+% |_|  |_|_____|_| \_|  |_|  |______|_____/ 
+
+\usepackage{minted}
+
+\newlength{\charwidth}
+\settowidth{\charwidth}{\small\texttt{m}}
+
+\newcommand{\minline}[2]{\text{\mintinline[fontsize=\small,escapeinside=~~]{#1}{#2}}}
+\newcommand{\eI}[1]{\minline{elpi}{#1}}
+\newcommand{\cI}[1]{\minline{coq}{#1}}
+\newcommand{\mlI}[1]{\minline{ocaml}{#1}}
+
+\newcommand{\mintopt}{fontsize=\small,autogobble,escapeinside=~~,mathescape=true,frame=leftline,framerule=0pt,framesep=1em}
+
+\newenvironment{mminted}[1]{%
+  % \vspace{0.2em}%
+  \VerbatimEnvironment
+  \begin{minted}[fontsize=\small,autogobble,escapeinside=~~,mathescape=true,frame=leftline,framerule=0pt,framesep=1em]{#1}%
+}{%
+  \end{minted}%
+  % \vspace{0.2em}%
+}
+
+\newenvironment{coqcode}{%
+  \VerbatimEnvironment
+  \begin{mminted}{coq}%
+}{%
+  \end{mminted}%
+}
+
+\newenvironment{elpicode}{%
+  \VerbatimEnvironment
+  \begin{mminted}{elpi}%
+    }{%
+  \end{mminted}%
+}
+
+\newenvironment{hscode}{%
+  \VerbatimEnvironment
+  \begin{mminted}{hs}%
+    }{%
+  \end{mminted}%
+}

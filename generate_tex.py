@@ -40,6 +40,7 @@ def print_tex(f,lines, fout, raw = False):
             cnt1 = fr.read()
             if cnt == cnt1:
                 return
+    print(cnt)
     with open(fout, "w") as fw:
         fw.write(cnt)
 
@@ -81,6 +82,7 @@ def read_file(out,fname):
 
         
 if __name__ == "__main__":
+    print(sys.argv)
     out = sys.argv[1]
     fname = sys.argv[2]
     read_file(out,fname)
