@@ -1,5 +1,5 @@
 import os, sys, re
-import code2tex
+import code_wrapper
 
 def find_close_par(l, i):
     cnt = 1
@@ -98,7 +98,7 @@ class C:
                 cnt1 = fr.read()
                 if cnt == cnt1:
                     return
-        cnt = code2tex.build_cnt(cnt)
+        cnt = code_wrapper.build_cnt(cnt)
         with open(fout, "w") as f:
             f.write(cnt)
 

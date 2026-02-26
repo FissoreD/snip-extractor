@@ -2,7 +2,7 @@ TEXFILES := $(shell find . -type f -regex ".*\.\(elpi\|v\|hs\)")
 PDFFILES := $(TEXFILES:.elpi=.tex)
 PDFFILES := $(PDFFILES:.v=.tex)
 PDFFILES := $(PDFFILES:.hs=.tex)
-GENERATOR := ../../code2tex.py
+GENERATOR := ../../code_wrapper.py
 TEX_CMD = pdflatex -synctex=1 -interaction=nonstopmode --shell-escape 
 
 img: $(PDFFILES)
