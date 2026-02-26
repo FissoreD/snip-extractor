@@ -18,7 +18,7 @@ def max_len(l):
 def build_cnt(cnt:str):
     cnt_list = cnt.split("\n")
     len = max_len(cnt_list)
-    return "\\documentclass[border=2mm, varwidth]{standalone}\n" \
+    return "\\documentclass[border=2mm, varwidth=100cm]{standalone}\n" \
         "\\usepackage{mminted}\n" \
         "\\usepackage{macro}\n" \
         "\\begin{document}\n" \

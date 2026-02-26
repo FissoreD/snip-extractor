@@ -8,19 +8,17 @@
 \usepackage{minted}
 
 \newlength{\charwidth}
-\settowidth{\charwidth}{\small\texttt{m}}
+\settowidth{\charwidth}{\texttt{m}}
 
-\newcommand{\minline}[2]{\mintinline[fontsize=\small,escapeinside=~~]{#1}{#2}}
+\newcommand{\minline}[2]{\mintinline[escapeinside=~~]{#1}{#2}}
 \newcommand{\eI}[1]{\minline{elpi}{#1}}
 \newcommand{\cI}[1]{\minline{coq}{#1}}
 \newcommand{\mlI}[1]{\minline{ocaml}{#1}}
 
-\newcommand{\mintopt}{fontsize=\small,autogobble,escapeinside=~~,mathescape=true,frame=leftline,framerule=0pt,framesep=1em}
-
 \newenvironment{mminted}[1]{%
   % \vspace{0.2em}%
   \VerbatimEnvironment
-  \begin{minted}[fontsize=\small,autogobble,escapeinside=~~,mathescape=true,frame=leftline,framerule=0pt,framesep=1em]{#1}%
+  \begin{minted}[autogobble,escapeinside=~~,mathescape=true,frame=leftline,framerule=0pt,framesep=1em]{#1}%
 }{%
   \end{minted}%
   % \vspace{0.2em}%
