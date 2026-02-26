@@ -256,8 +256,8 @@ if __name__ == "__main__":
                 return f"~{l}~" if escape else l
             def m(l) : 
                 return f"\\\\ensuremath{{{l}}}"
-            l = l.replace("%", "\%")
             if not escape:
+                l = l.replace("%", "\%")
                 l = re.sub(r'_', '\\_', l)
             return l
         return f
