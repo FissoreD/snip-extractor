@@ -264,9 +264,10 @@ if __name__ == "__main__":
 
     out = sys.argv[1]
     fname = sys.argv[2]
+    thout = sys.argv[3] if len(sys.argv) > 2 else out
     bussproof(out,clean_line).read_file(fname)
     if fname.endswith(".v"):
         snip("(*", "*)", "coqcode","cI",out,"v",clean_line).read_file(fname)
-        theorem("coqcode","cI",out,clean_line).read_file(fname)
+        theorem("coqcode","cI",thout,clean_line).read_file(fname)
     if fname.endswith(".elpi"):
         snip("%", "", "elpicode","eI",out,"elpi",clean_line).read_file(fname)
