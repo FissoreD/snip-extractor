@@ -1,26 +1,14 @@
 import os, sys, re
 import code_wrapper
 
-def find_close_par(l, i):
-    cnt = 1
-    for i in range(i+1,len(l)):
-        c = l[i]
-        if c == ")": cnt -=1
-        elif c == "(": cnt += 1
-        if cnt == 0: return i
-    return -1
-
-def remove_some_par(l):
-    s = "(Some"
-    if s not in l: return l
-    p = l.index(s)
-    cl = find_close_par(l, p)
-    if cl > p:
-        l = l[:p] + "s" + l[p+2:cl] + l[cl+1:]
-        return remove_some_par(l)
-    else:
-        raise Exception("ERROR")
-
+# Base class for snippet/latex generation.  
+# clean_line is not a plain string processor; it must be a callable that
+# accepts a **boolean** and returns another function taking a **string**.
+# The boolean indicates whether the line to be cleaned is part of a minted
+# code environment (i.e. verbatim text).  When `escape` is False the caller
+# is outside a verbatim block and extra escaping (e.g. converting `_` to
+# `\_`) is required. Passing `escape` through allows subclasses to know the
+# context when performing replacements.
 class C:
     def __init__(self,oc,ec,od,ext,ot,ct,esc,clean_line):
         self.OPEN_COMMENT = oc
@@ -30,6 +18,8 @@ class C:
         self.OPEN_TAG = ot
         self.CLOSE_TAG = ct
         self.escape = esc
+        # `clean_line` is called here with the escape flag to produce a
+        # per-line cleaning function used throughout the class.
         self.clean_line = clean_line(self.escape)
 
     def get_file_cnt(self,lines):
