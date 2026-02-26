@@ -1,0 +1,248 @@
+type fatal any -> o.
+type fatal any -> any -> o.
+type fatal any -> any -> any -> o.
+type fatal any -> any -> any -> any -> o.
+type fatal any -> any -> any -> any -> any -> o.
+fatal A :- failsafe, !, print A, fail.
+fatal A B :- failsafe, !, print A B, fail.
+fatal A B C :- failsafe, !, print A B C, fail.
+fatal A B C D :- failsafe, !, print A B C D, fail.
+fatal A B C D E :- failsafe, !, print A B C D E, fail.
+fatal A :- halt A.
+fatal A B :- halt A B.
+fatal A B C :- halt A B C.
+fatal A B C D :- halt A B C D.
+fatal A B C D E :- halt A B C D E.
+type failsafe o.
+
+%BEGIN
+kind nat type.
+type z nat.
+type s nat -> nat.
+
+% kind bool type.
+% type tt bool.
+% type ff bool.
+
+% kind option type -> type.
+% type some A -> option A.
+% type none option A.
+
+type int->nat int -> nat -> o.
+int->nat 0 z.
+int->nat R (s N) :- R > 0, R' is R - 1, int->nat R' N.
+
+type nth nat -> list A -> A -> o.
+nth z (X :: _) Y  :- !, X = Y.
+nth (s N) (_ :: L) X :- nth N L X.
+
+type list-init nat -> nat -> (nat -> A -> o) -> list A -> o.
+list-init Len Len _ [].
+list-init Len Pos F [A | TL] :- F Pos A, list-init Len (s Pos) F TL.
+
+type iota nat -> list nat -> o.
+iota N L :- list-init N z (=) L.
+
+type partition (A -> o) -> list A -> list A -> list A -> o.
+partition _ [] [] [].
+partition F [A|As] [A|Bs] Cs :- F A, !, partition F As Bs Cs.
+partition F [A|As] Bs [A|Cs] :- partition F As Bs Cs.
+
+type index list A -> A -> nat -> o.
+index [A|_] A z :- !.
+index [_|TL] A (s P) :- index TL A P.
+
+type take-list list A -> A -> list A -> o.
+take-list [L|XS] L XS.
+take-list [L|XS] L' [L|YS] :- not(L = L'), take-list XS L' YS.
+
+type not-in list A -> A -> o.
+not-in [] _.
+not-in [X | TL] T :- not (X = T), not-in TL T.
+
+type exists (A -> o) -> list A -> o.
+exists F [X|XS] :- F X ; exists F XS.
+
+type forall2 (A -> B -> o) -> list A -> list B -> o.
+forall2 _ [] [].
+forall2 F [X|XS] [Y|YS] :- F X Y, forall2 F XS YS.
+
+type forall3 (A -> B -> C -> o) -> list A -> list B -> list C -> o.
+forall3 _ [] [] [].
+forall3 F [X|XS] [Y|YS] [Z|ZS] :- F X Y Z, forall3 F XS YS ZS.
+
+/* same as forall2, sometimes more intuitive name */
+type map (A -> B -> o) -> list A -> list B -> o.
+map _ [] [].
+map F [X|XS] [Y|YS] :- F X Y, map F XS YS.
+
+type fold2 (A -> A1 -> B -> B -> o) -> list A -> list A1 -> B -> B -> o.
+fold2 _ [] [] A A.
+fold2 F [X|XS] [Y|YS] A A1 :- F X Y A A0, fold2 F XS YS A0 A1.
+
+type fold (A -> B -> B -> o) -> list A -> B -> B -> o.
+fold _ [] A A.
+fold F [X|XS] A A1 :- F X A A0, fold F XS A0 A1.
+
+type (>n) nat -> nat -> o.
+s _ >n z.
+s N >n s M :- N >n M.
+
+type (>=n) nat -> nat -> o.
+_ >=n z.
+s N >=n s M :- N >=n M.
+
+type diff nat -> nat -> o.
+diff N M :- N >n M ; M >n N.
+
+type map-fold2 (A -> A1 -> B -> B -> C -> C -> o) -> list A -> B -> C -> list A1 -> B -> C -> o.
+map-fold2 _F [] B C [] B C.
+map-fold2 F [X | XS] B C [Y | YS] B2 C2 :-
+  F X Y B B1 C C1,
+  map-fold2 F XS B1 C1 YS B2 C2.
+
+type mem (list A) -> A -> o.
+mem [A|_] A :- !.
+mem [_|L] A :- mem L A.
+
+
+type append list A -> list A -> list A -> o.
+append [] A A.
+append [A | TL] L [A | L'] :- append TL L L'.
+
+type fold4 (A -> A1 -> B -> B -> C -> C -> o) -> list A -> list A1 -> B -> B -> C -> C -> o.
+fold4 _ [] [] A A B B.
+fold4 F [X|XS] [Y|YS] A A1 B B1 :- F X Y A A0 B B0, fold4 F XS YS A0 A1 B0 B1.
+
+type fold6 (A -> A1 -> B -> B -> C -> C -> D -> D -> o) -> list A -> list A1 -> B -> B -> C -> C -> D -> D -> o.
+fold6 _ [] [] A A B B C C.
+fold6 F [X|XS] [Y|YS] A A1 B B1 C C1 :- F X Y A A0 B B0 C C0, fold6 F XS YS A0 A1 B0 B1 C0 C1.
+
+type flatten-aux list A -> list (list A) -> list A -> o.
+flatten-aux [] L L1 :- flatten L L1.
+flatten-aux [A|As] L [A|L1] :- flatten-aux As L L1.
+
+type flatten list (list A) -> list A -> o.
+flatten [] [].
+flatten [H|L] R :- flatten-aux H L R.
+
+type all list o -> o.
+all [].
+all [P|PS] :- P, all PS.
+
+type forall1 (X -> o) -> list X -> o.
+forall1 _ L :- var L, !.
+forall1 P [X|XS] :- P X, forall1 P XS.
+forall1 _ [].
+
+type none (X -> o) -> list X -> o.
+none _ [].
+none P [X|Xs] :- not (P X), none P Xs.
+
+type undup list A -> list A -> o.
+undup [] [].
+undup [X|Xs] [X|R] :- not-in Xs X, !, undup Xs R.
+undup [_|Xs] R :- undup Xs R.
+
+type len list A -> nat -> o.
+len [] z.
+len [_|L] (s X) :- len L X.
+
+type rev list A -> list A -> o.
+rev L RL  :- rev.aux L []  RL.
+
+type rev.aux list A -> list A -> list A -> o.
+rev.aux [X|XS] ACC R :- rev.aux XS [X|ACC] R.
+rev.aux [] L L.
+
+type filter list A -> (A -> prop) -> list A -> o.
+filter []    _ [].
+filter [X|L] P R :- if (P X) (R = X :: L1) (R = L1), filter L P L1.
+
+type filter2 list A -> list B -> (A -> B -> prop) -> list A -> o.
+filter2 [] []   _ [].
+filter2 [X|L] [Y|YS] P R :- if (P X Y) (R = X :: L1) (R = L1), filter2 L YS P L1.
+
+% [pattern-fragment-prefix L [] ]
+%SNIP: pattern_fragment_prefix
+type pattern-fragment-prefix-aux list A -> list A -> list A -> list A -> o.
+pattern-fragment-prefix-aux [] _ [] [].
+pattern-fragment-prefix-aux [X | L] ACC [X | PF] NPF :- name X, not-in ACC X, !, 
+  pattern-fragment-prefix-aux L [X | ACC] PF NPF.
+pattern-fragment-prefix-aux L _ [] L.
+%ENDSNIP
+
+type pattern-fragment-prefix list A -> list A -> list A -> o.
+pattern-fragment-prefix L PF NPF :- pattern-fragment-prefix-aux L [] PF NPF.
+
+%SNIP: pattern_fragment
+type pattern-fragment list A -> o.
+%ENDSNIP
+pattern-fragment L :- distinct_names L.
+%END
+
+type minus nat -> nat -> nat -> o.
+minus z _ z.
+minus A z A.
+minus (s N) (s M) R :- minus N M R.  
+
+type last list A -> A -> o.
+last [A] A.
+last [_|L] A :- last L A.
+
+type drop-first-n nat -> list A -> list A -> o.
+drop-first-n z L L.
+drop-first-n (s N) [_|As] Bs :- drop-first-n N As Bs. 
+
+type last-n nat -> list A -> list A -> o.
+last-n N L R :- minus {len L} N PrefLen, drop-first-n PrefLen L R.
+
+type split nat -> list A -> list A -> list A -> o.
+split z L [] L.
+split (s N) [A|As] [A|Bs] L :- split N As Bs L.
+
+type split-last-n nat -> list A -> list A -> list A -> o.
+split-last-n N L First Last :- minus {len L} N PrefLen, split PrefLen L First Last.
+
+kind test type -> type.
+type test int -> (pair (list (triple diagnostic A A)) (option(list A))) -> test A.
+type declare-test (test fo.to -> o) -> (test fo.to -> string -> o) -> test fo.to -> o.
+
+kind triple type -> type -> type -> type.
+type triple A -> B -> C -> triple A B C.
+
+type no-duplicated-test int -> list o -> o.
+no-duplicated-test N L :-
+  mem L (declare-test _ _ (test N _)),
+  halt "Duplicated test with index" N.
+no-duplicated-test _ _.
+
+type runtests list o -> list int -> o.
+runtests [] [] :- print "ALL GOOD!".
+runtests [] F :- print "SOME TEST FAIL:" F, fail.
+runtests [declare-test F PP (test N _ as T) |TS] ERR :- print "\n-----" N "-------\n\n\n",
+  no-duplicated-test N TS,
+  PP T Tstr,
+  if (F T) (print "ok" Tstr, runtests TS ERR)
+           (print "\n<<<<<\nko" Tstr "\n>>>>>\n", runtests TS [N|ERR]).
+
+type internal-tests o.
+type internal-test o -> o.
+
+internal-tests :-
+  std.findall (internal-test _) L,
+  forall1 runinternal L, !.
+
+type runinternal o -> o.
+runinternal (internal-test P) :- print "######" P, P, !.
+runinternal (internal-test P) :- halt "fail internal test" P.
+
+type ppnat-aux nat -> int -> o.
+ppnat-aux z 0.
+ppnat-aux (s N) M :- ppnat-aux N M1, M is M1 + 1.
+
+type ppnat nat -> string -> o.
+ppnat X _ :- var X, halt "ppnat: passed flexible arg".
+ppnat N S :- ppnat-aux N M, std.any->string M S.
+
+type tex o.

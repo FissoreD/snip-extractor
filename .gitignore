@@ -5,3 +5,5 @@
 **/*.pdf
 **/*.gz
 __pycache__
+**/*.fdb_latexmk
+**/*.fls

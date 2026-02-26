@@ -15,18 +15,15 @@ def max_len(l):
         m = max(m, len(i))
     return m
 
-def build_cnt(ext,cnt):
-    len = max_len(cnt)
-    cnt = "".join(cnt)
-    mint_tag = f"{extension_mapper[ext]}code"
-    return "\\documentclass[border=2mm, varwidth]{standalone}" \
-        "\\usepackage{mminted}" \
-        "\\usepackage{macro}" \
-        "\\begin{document}" \
-        f"\\begin{{varwidth}}{{{len+2}\\charwidth}}" \
-        f"\\begin{{{mint_tag}}}\n"\
-        f"{cnt}\n"\
-        f"\\end{{{mint_tag}}}\n"\
+def build_cnt(cnt:str):
+    cnt_list = cnt.split("\n")
+    len = max_len(cnt_list)
+    return "\\documentclass[border=2mm, varwidth]{standalone}\n" \
+        "\\usepackage{mminted}\n" \
+        "\\usepackage{macro}\n" \
+        "\\begin{document}\n" \
+        f"\\begin{{varwidth}}{{{len+3}\\charwidth}}\n" \
+        f"{cnt}\n" \
         "\\end{varwidth}"\
         "\\end{document}"
 
@@ -45,9 +42,14 @@ def build_file(fname):
     with open(fname) as cnt:
         cnt = cnt.readlines()
         cnt = clean_cnt(cnt)
-        l = max_len(cnt)
         path = Path(fname)
-        cnt = build_cnt(path.suffix,cnt)
+        mint_tag = f"{extension_mapper[path.suffix]}code"
+        cnt_flat = "".join(cnt)
+        cnt = f"\\begin{{{mint_tag}}}\n" \
+            f"{cnt_flat}\n" \
+            f"\\end{{{mint_tag}}}\n"
+        print("CNT IS", cnt)
+        cnt = build_cnt(cnt)
         with open(path.stem + ".tex", "w") as fout:
             fout.write(cnt)
 
