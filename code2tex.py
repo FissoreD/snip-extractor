@@ -48,7 +48,6 @@ def build_file(fname):
         cnt = f"\\begin{{{mint_tag}}}\n" \
             f"{cnt_flat}\n" \
             f"\\end{{{mint_tag}}}\n"
-        print("CNT IS", cnt)
         cnt = build_cnt(cnt)
         with open(path.stem + ".tex", "w") as fout:
             fout.write(cnt)

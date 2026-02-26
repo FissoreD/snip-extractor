@@ -21,82 +21,8 @@ def remove_some_par(l):
     else:
         raise Exception("ERROR")
 
-def clean_line_global(l,escape):
-    # if you want to replace with math notation, prefix the string with a call to m
-    # if you need to escape minted mode, call esc 
-    def esc(l):
-        return f"~{l}~" if escape else l
-    def m(l) : 
-        return f"\\\\ensuremath{{{l}}}"
-    l = l.replace("%", "\%")
-    # l = remove_some_par(l)
-    # l = l.replace("%G", "")
-    # l = re.sub(r'\b_\w+\b', '_', l)
-    if not escape:
-        l = re.sub(r'_', '\\_', l)
-    # l = re.sub(r'#', esc(m('\\\\#')), l)
-    # l = re.sub(r'\+\+', esc('\\\\mappend'), l)
-    # l = re.sub(r'\[::\]', esc('\\\\mnil'), l)
-    # l = re.sub("Sigma", esc(m("\\\\Sigma")), l)
-    # # l = re.sub("tree", esc("\\tau"), l)
-    # l = re.sub("empty", esc(m("\\\\epsilon")), l)
-    # l = re.sub("fvS", esc(m("\\\\FV")), l)
-    # l = re.sub("bool", esc(m("\\\\mathbb{B}")), l)
-    # l = re.sub("program", esc(m("\\\\mathbb{P}")), l)
-    # l = re.sub("<->", esc(m("\\\\leftrightarrow")), l)
-    # l = re.sub("->", esc(m("\\\\to")), l)
-    # l = re.sub("=>", esc(m("\\\\Rightarrow")), l)
-    # l = re.sub("/\\\\", esc(m("\\\\land")), l)
-    # # l = re.sub(":=", esc(m("\\\\coloneq")), l)
-    # l = re.sub("forall", esc(m("\\\\forall")), l)
-    # l = re.sub("exists", esc(m("\\\\exists")), l)
-    # l = re.sub("None", esc(m("\\\\square")), l)
-    # l = re.sub(r"\bmkR\b", "", l)
-    # # l = re.sub(r"\bA\b", "Atom", l)
-    # l = re.sub(r"\bseq\b", "list", l)
-    # l = re.sub(r"\bpath_atom\b", "incomplete", l)
-    # l = re.sub(r"\bget_subst\b", "next_subst", l)
-    # l = re.sub(r"\bpath_end\b", "next_tree", l)
-    # l = re.sub(r"\bget_end\b", "next", l)
-    # l = re.sub(r"\bTA\b", "Todo", l)
-    # l = re.sub(r"`<=`", esc(m("\\\\subseteq")), l)
-    # l = re.sub(r"∨", esc(m("\\\\lor")), l)
-    # l = re.sub(r"∧", esc(m("\\\\land")), l)
-    # if escape:
-    #     l = re.sub("some *", esc("\\\\msome"), l)
-    #     l = re.sub("Some *", esc("\\\\msome"), l)
-    # else:
-    #     l = re.sub("Some", esc("\\\\msome"), l)
-    #     l = re.sub("some", esc("\\\\msome"), l)
-    # l = re.sub("true", esc(m("\\\\top")), l)
-    # l = re.sub("false", esc(m("\\\\bot")), l)
-    # l = l.replace("\bsm\b", " " + esc(m("s_m")) + " ")
-    # pat = ["v","b","t","r","a", "g", "l"]
-
-    # def clean_esc(l):
-    #     m = l.group(1)
-    #     return  "\\ensuremath{\\phantom{!}_{\!\!" + m.replace("~", "").replace("$","") + "}}"
-
-
-    # def change_vars(vn, gl, l):
-    #     return re.sub(f"\\b{vn}('+)|\\b{vn}\\b", esc(m(f"{gl}\g<1>")), l)
-    # def it_pat(pat,gl,l):
-    #     l = change_vars(pat, gl, l)
-    #     for i in range(10):
-    #         l = change_vars(f"{pat}{i}", f"{gl}_{i}", l)
-    #     return l
-    # l = it_pat("s", "\\\\sigma", l)
-    # for p in pat:
-    #     l = it_pat(p, p, l)
-        
-    # l = l.replace("step_tag", "tag") # FIXME
-    # l = re.sub("\\\\/", esc(m("\\\\lor")), l)
-    # # l = re.sub("-sub", esc(m("x\\_")), l)
-    # l = re.sub(r' -sub\(([^)]*)\)', lambda x: esc(clean_esc(x)), l)
-    return l
-
 class C:
-    def __init__(self,oc,ec,od,ext,ot,ct,esc):
+    def __init__(self,oc,ec,od,ext,ot,ct,esc,clean_line):
         self.OPEN_COMMENT = oc
         self.END_COMMENT = ec
         self.OUT_DIR = od
@@ -104,6 +30,7 @@ class C:
         self.OPEN_TAG = ot
         self.CLOSE_TAG = ct
         self.escape = esc
+        self.clean_line = clean_line(self.escape)
 
     def get_file_cnt(self,lines):
         res = []
@@ -119,8 +46,8 @@ class C:
         return re.sub(fr"^ *{re.escape(self.OPEN_COMMENT)}.*\n","",l)
 
 
-    def clean_line(self,l):
-        return clean_line_global(l,self.escape)
+    # def clean_line(self,l):
+    #     return clean_line_global(l,self.escape)
         
 
     def mk_fname(self,fname):
@@ -176,8 +103,8 @@ class C:
             f.write(cnt)
 
 class snip(C):
-    def __init__(self,open_comment,close_comment,mintag,mintinl,out,ext):
-        super(snip,self).__init__(open_comment,close_comment,out,ext,"SNIP:","ENDSNIP",True)
+    def __init__(self,open_comment,close_comment,mintag,mintinl,out,ext,clean_line):
+        super(snip,self).__init__(open_comment,close_comment,out,ext,"SNIP:","ENDSNIP",True,clean_line)
         self.MINT_TAG = mintag
         self.MINT_INLINE = mintinl
 
@@ -208,8 +135,8 @@ It displaies a mintinline if the definition is of exactely one line,
 otherwise it displaies a minted multiline code-block
 """
 class theorem(C):
-    def __init__(self,mintag,mintinl,out):
-        super(theorem,self).__init__("(*","*)",out,"v","SNIPT:","ENDSNIPT",True)
+    def __init__(self,mintag,mintinl,out,clean_line):
+        super(theorem,self).__init__("(*","*)",out,"v","SNIPT:","ENDSNIPT",True,clean_line)
         self.MINT_TAG = mintag
         self.MINT_INLINE = mintinl
 
@@ -264,8 +191,8 @@ def flatten(xss):
 def stack_anchor(f1,f2):
     return f"\stackanchor{{{f1}}}{{{f2}}}"
 class bussproof(C):
-    def __init__(self,out):
-        super(bussproof,self).__init__("(*","*)",out,"v","prooftree:","endprooftree",False)
+    def __init__(self,out,clean_line):
+        super(bussproof,self).__init__("(*","*)",out,"v","prooftree:","endprooftree",False,clean_line)
 
 
 
@@ -333,11 +260,23 @@ class bussproof(C):
         super().write(fout,cnt)
 
 if __name__ == "__main__":
+    def clean_line(escape):
+        def f(l):
+            def esc(l):
+                return f"~{l}~" if escape else l
+            def m(l) : 
+                return f"\\\\ensuremath{{{l}}}"
+            l = l.replace("%", "\%")
+            if not escape:
+                l = re.sub(r'_', '\\_', l)
+            return l
+        return f
+
     out = sys.argv[1]
     fname = sys.argv[2]
-    bussproof(out).read_file(fname)
+    bussproof(out,clean_line).read_file(fname)
     if fname.endswith(".v"):
-        snip("(*", "*)", "coqcode","cI",out,"v").read_file(fname)
-        theorem("coqcode","cI",out).read_file(fname)
+        snip("(*", "*)", "coqcode","cI",out,"v",clean_line).read_file(fname)
+        theorem("coqcode","cI",out,clean_line).read_file(fname)
     if fname.endswith(".elpi"):
-        snip("%", "", "elpicode","eI",out,"elpi").read_file(fname)
+        snip("%", "", "elpicode","eI",out,"elpi",clean_line).read_file(fname)
