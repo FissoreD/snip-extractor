@@ -79,11 +79,12 @@ class C:
     def print_tex(lines, fout, raw = False):
         raise Exception("TO BE IMPLEMENTED IN CHILD")
 
-    def write(self,fout,cnt):
+    def write(self,fout,cnt,standalone=True):
         if not os.path.exists(self.OUT_DIR):
             os.makedirs(self.OUT_DIR)
         fout = f"{self.OUT_DIR}/{fout}"
-        cnt = code_wrapper.build_cnt(cnt)
+        if standalone:
+            cnt = code_wrapper.build_cnt(cnt)
         if os.path.exists(fout):
             with open(fout, "r") as fr:
                 cnt1 = fr.read()
@@ -167,7 +168,7 @@ class theorem(C):
             cnt += f"\\end{{{self.MINT_TAG}}}\n"
         cnt += f"\end{{{env}}}"
         
-        super().write(fout,cnt)
+        super().write(fout,cnt,standalone=False)
 
 
 def flatten(xss):
