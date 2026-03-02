@@ -83,8 +83,8 @@ class C:
         if not os.path.exists(self.OUT_DIR):
             os.makedirs(self.OUT_DIR)
         fout = f"{self.OUT_DIR}/{fout}"
-        if standalone:
-            cnt = code_wrapper.build_cnt(cnt)
+        # if standalone:
+        #     cnt = code_wrapper.build_cnt(cnt)
         if os.path.exists(fout):
             with open(fout, "r") as fr:
                 cnt1 = fr.read()
