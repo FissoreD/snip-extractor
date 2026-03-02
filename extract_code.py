@@ -74,23 +74,26 @@ class C:
             lines = f.readlines()
             snippets = self.get_snippets(lines)
             for (fname,lines) in snippets.items():
-                self.print_tex(lines, fname + ".tex")
+                self.print_tex(lines, fname)
 
     def print_tex(lines, fout, raw = False):
         raise Exception("TO BE IMPLEMENTED IN CHILD")
 
-    def write(self,fout,cnt,standalone=True):
+    def write(self,fname,cnt,standalone=True):
         if not os.path.exists(self.OUT_DIR):
             os.makedirs(self.OUT_DIR)
-        fout = f"{self.OUT_DIR}/{fout}"
+        fout1 = f"{self.OUT_DIR}/{fname}.tex"
+        # fout2 = f"{self.OUT_DIR}/{fname}-alone.tex"
+        # with open(fout2, "w") as f:
+        #     f.write(code_wrapper.build_cnt(cnt))
         # if standalone:
         #     cnt = code_wrapper.build_cnt(cnt)
-        if os.path.exists(fout):
-            with open(fout, "r") as fr:
+        if os.path.exists(fout1):
+            with open(fout1, "r") as fr:
                 cnt1 = fr.read()
                 if cnt == cnt1:
                     return
-        with open(fout, "w") as f:
+        with open(fout1, "w") as f:
             f.write(cnt)
 
 class snip(C):
