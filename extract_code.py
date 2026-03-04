@@ -1,5 +1,4 @@
 import os, sys, re
-import code_wrapper
 
 # Base class for snippet/latex generation.  
 # clean_line is not a plain string processor; it must be a callable that
