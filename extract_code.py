@@ -65,7 +65,10 @@ class C:
                 else:
                     # we are exiting a snippet, by default we close the 
                     if len(cursnips)>0:
-                        snips[curnames.pop()] = cursnips.pop()
+                        curname = curnames.pop()
+                        cursnip = cursnips.pop()
+                        cnt = snips.get(curname, [])
+                        snips[curname] = cnt + cursnip
         return snips
 
     def read_file(self,fname):
