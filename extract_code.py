@@ -160,20 +160,21 @@ class theorem(C):
         (env,name,args), tl = self.th_name(lines[0]), lines[1:]
         n1 = name.replace('_', '\_')
         n2 = name.replace('_', '')
-        args = "" if len(args) == 0 else (f" \\{self.MINT_INLINE}{{" + self.clean_line(" ".join(args)) + "}")
-        cnt += f"\\begin{{{env}}}[{n1}{args}]\label{{th:{n2}}}"
-        if len(tl) > 0:
-            txt = self.clean_line(tl[0].strip())
-            cnt += f"\\{self.MINT_INLINE}{{{txt}}}"
-            tl = tl[1:]
-        if len(tl) != 0:
-            cnt += f"~\n\\begin{{{self.MINT_TAG}}}\n"
-            for l in tl:
-                cnt += self.clean_line(self.clean_comment(l))
-            cnt += f"\\end{{{self.MINT_TAG}}}\n"
-        cnt += f"\end{{{env}}}"
         
-        super().write(fout,cnt,standalone=False)
+        if len (args) > 0:
+            tl[0] = f"fun {' '.join(args)} . " + tl[0]
+
+        cnt += f"\\begin{{{env}}}[{n1}]\label{{th:{n2}}}%\n"
+        l = list(map(lambda x: f"{self.clean_line(x)}", tl))
+        if len(l) == 1:
+            cnt += f"\t${l[0]}$"
+        else:
+            cnt += f"\\begin{{multline*}}\n\t"
+            cnt += "\\\\\n\t".join(l)
+            cnt += f"\n\\end{{multline*}}"
+        cnt += f"\n\end{{{env}}}"
+        
+        super().write(fout,cnt)
 
 
 def flatten(xss):
@@ -190,46 +191,22 @@ class bussproof(C):
     def __init__(self,out,clean_line):
         super(bussproof,self).__init__("(*","*)",out,"v","prooftree:","endprooftree",False,clean_line)
 
-
-
     def print_bp(self,name,hyps,concl):
         lines = ["\\begin{prooftree}"]
         # reset hyps if too many or too few
-        if len(hyps) == 4:
-            x = []
-            for i in range (len(hyps)//2):
-                x.append(stack_anchor(hyps[2*i], hyps[2*i+1]))
-            hyps = x
-            
-
-        for s in hyps:
-            lines.append(f"  \\AxiomC{{{(s)}}}")
-
-        n = len(hyps)            
-
-        if n == 0:
-            n = 1
-            lines.append("  \\AxiomC{\phantom{A}}")
-
-        lines.append(f"  \\RightLabel{{\\textit{{{(name)}}}}}")
-
-        L = ["Unary","Binary","Trinary"]
-
-        if n > len(L):
-            print(hyps)
-            raise ValueError("Too many premises for bussproofs")
+        if len(hyps) == 0:
+            hyps_cat = "~"
         else:
-            tag = L[n-1]
+            hyps_cat = " \\qquad ".join(hyps)
+        lines.append(f"\t\\AxiomC{{${hyps_cat}$}}")
 
-        lines.append(f"  \\{tag}InfC{{{(concl)}}}")
+        lines.append(f"  \\RightLabel{{${name}$}}")
+
+
+        lines.append(f"  \\UnaryInfC{{${(concl)}$}}")
 
         lines.append("\\end{prooftree}")
         return "\n".join(lines)
-
-    def clean_line(self, l):
-        # l = l.replace("_","\_")
-        # l = l.replace("&","\&")
-        return super().clean_line(l)
     
     def split_hyps(self,hyps):
         hyps = hyps.split("->")
